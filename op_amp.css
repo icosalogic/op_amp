@@ -1,0 +1,56 @@
+
+h1 {
+  text-align: center;
+}
+h2 {
+  margin-left: 200px;
+}
+h3 {
+  margin-left: 0px;
+}
+
+.plink {
+  text-decoration:underline;
+}
+input  {
+  width: 6em;
+}
+select {
+  width: 6em;
+}
+
+.oa_text {
+  font-size: large;
+  margin: 0px 200px 50px 200px;
+  background: lightgrey;
+  border: thin solid;
+  padding: 20px;
+}
+
+.equation {
+  margin-left: 3em;
+  font-family: courier;
+  font-size: medium;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.subtable {
+  text-align: center;
+  border: thin solid;
+  border-collapse: collapse;
+}
+
+.subtable td {
+  border: thin solid;
+  margin: 6px;
+}
+
+.subtable tr {
+  border: thin solid;
+}
+
+.op_img {
+  border: thin solid;
+  margin: 6px;
+}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
+  <title>IcosaLogic Op Amp Simulator</title>
+  <link rel="stylesheet" href="op_amp.css">
+  <script type='text/javascript' src='op_amp.js'></script>
+  <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js' async></script>
+
+</head>
+
+
+<body onload='icosalogic.op_amp.onLoadHandler()'>
+  <h1 id='main_title' style='text-align: center'>IcosaLogic Op Amp Simulator</h1>
+  <div class='oa_text'>
+  This opamp simulator lets you enter the amplitude and center offset voltages of both the input and output values.
+  The simulator will then auto-configure the value of the feedback resistor
+  and the reference voltage, and plot a graph of input and output sine waves.
+  You can specify inverting or non-inverting opamp circuits, and also enter a test value to plot in the graph.
+  If any output value exceeds the range V<sub>neg</sub>..V<sub>pos</sub>, it will be truncated.
+  </div>
+  <table>
+    <tr>
+      <td style='vertical-align:top'>
+        <table>
+          <tr>
+            <div id='opamp_circuit'>
+            </div>
+          </tr>
+          <tr>
+            <td> <h3>Input Range</h3> </td>
+            <td> <button type='button' name='row_inr' value='h'>Hide</button> </td>
+          </tr>
+          <tr class='row_inr'>
+            <td><label for='vin_rhalf'  >Vin_range_half</label></td>   <td><input id='vin_rhalf'  type='number' value='1.0' ></td>  <td>V</td>
+          </tr>
+          <tr class='row_inr'>
+            <td><label for='vin_offset' >Vin_offset    </label></td>   <td><input id='vin_offset' type='number' value='0.0' ></td> <td>V</td>
+          </tr>
+          <tr>
+            <td> <h3>Output Range</h3> </td>
+            <td> <button type='button' name='row_outr' value='h'>Hide</button> </td>
+          </tr>
+          <tr class='row_outr'>
+            <td><label for='vout_rhalf'  >Vout_range_half</label></td>   <td><input id='vout_rhalf'  type='number' value='2.0' ></td>  <td>V</td>
+          </tr>
+          <tr class='row_outr'>
+            <td><label for='vout_offset' >Vout_offset    </label></td>   <td><input id='vout_offset' type='number' value='0.0' ></td> <td>V</td>
+          </tr>
+          <tr>
+            <td> <h3>Op Amp Config</h3> </td>
+            <td> <button type='button' name='row_cfg' value='h'>Hide</button> </td>
+          </tr>
+          <tr class='row_cfg'>
+            <td> <label for='ctype'  >Circuit  </label></td>
+            <td span='2'>
+              <select id='ctype' onchange='icosalogic.op_amp.showCircuit()'>
+                <option value='inv'>Inverting</option>
+                <option value='noninv'>Non-Inverting</option>
+              </select>
+            </td>
+          </tr>
+          <tr class='row_cfg'>
+            <td><label for='vpos'   >Vpos     </label></td>   <td><input id='vpos'    type='number' value='15.0' ></td>  <td>V</td>
+          </tr>
+          <tr class='row_cfg'>
+            <td><label for='vneg'   >Vneg     </label></td>   <td><input id='vneg'    type='number' value='-15.0' ></td>  <td>V</td>
+          </tr>
+          <tr class='row_cfg'>
+            <td><label for='vref'   >Vref     </label></td>   <td><input id='vref'    type='number' value='0.0' ></td>  <td>V</td>
+          </tr>
+          <tr>
+            <td> <h3>Test Input</h3> </td>
+            <td> <button id='test_input_hide' type='button' name='row_in' value='h'>Hide</button> </td>
+          </tr>
+          <tr class='row_in'>
+            <td><label for='vin'  >vin</label></td>   <td><input id='vin'   type='number' value='0.000' ></td>  <td>V</td>
+          </tr>
+          <tr>
+            <td> <h3>Computed Values</h2> </td>
+            <td> <button type='button' name='row_comp' value='h'>Hide</button> </td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='rfb'       >Rfeedback   </label></td> <td><input id='rfb'        type='number' value='2000' ></td> <td>Ohm</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='r1'        >R1          </label></td> <td><input id='r1'         type='number' value='1000' ></td> <td>Ohm</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='vin_range' >Vin_range   </label></td> <td><input id='vin_range'  type='number' readonly></td>  <td>V</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='vout_range'>Vout_range  </label></td> <td><input id='vout_range' type='number' readonly></td>  <td>V</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='gain'      >Gain        </label></td> <td><input id='gain'       type='number' readonly></td>  <td></td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='vout_raw'  >Vout_raw    </label></td> <td><input id='vout_raw'   type='number' readonly></td>  <td>V</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='vout'      >Vout_test   </label></td> <td><input id='vout'       type='number' readonly></td> <td>V</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='i_fb'      >I Feedback  </label></td> <td><input id='i_fb'       type='number' readonly></td>  <td>mA</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='w_rf'      >Rfb Power   </label></td> <td><input id='w_rf'       type='number' readonly></td>  <td>mW</td>
+          </tr>
+          <tr class='row_comp'>
+            <td><label for='w_r1'      >R1 Power    </label></td> <td><input id='w_r1'       type='number' readonly></td> <td>mW</td>
+          </tr>
+       </table>
+      </td>
+      <td style='vertical-align:top'>
+        <div id='opamp_content'>
+        </div>
+        <div>
+          <h2>Implementation Details</h2>
+          <div class='oa_text'>
+            <p>
+            We start with the generalized resistor divider circuit.
+            <br><br>
+            <img class='op_img' src='resistor_divider.png' width='300'>
+            <br><br>
+            V<sub>t</sub>, V<sub>m</sub> and V<sub>b</sub> represent the voltages at the top, middle, and bottom of the resistor divider, respectively.
+            R<sub>1</sub> is the resistor on the top, and R<sub>2</sub> is the resistor on the bottom.
+            </p>
+            Assuming V<sub>t</sub> and V<sub>b</sub> are fixed, and solving for V<sub>m</sub>, we get:
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) * (R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>))</span>
+            <br><br>
+            Before going any further, let's define a couple values for the resistor term in this equation.  First, invert the original term to get:
+            <br><br>
+            <span class='equation'>(R<sub>1</sub> + R<sub>2</sub>) / R<sub>2</sub></span>
+            <br><br>
+            Then expand and simplify it:
+            <br><br>
+            <span class='equation'>R<sub>1</sub> / R<sub>2</sub> + R<sub>2</sub> / R<sub>2</sub></span>
+            <br>
+            <span class='equation'>R<sub>1</sub> / R<sub>2</sub> + 1</span>
+            <br><br>
+            Then our definitions for gain are:
+            <br><br>
+            <span class='equation'>G<sub>i</sub> = R<sub>1</sub> / R<sub>2</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> = (R<sub>1</sub> / R<sub>2</sub>) + 1</span>
+            <br>
+            <span class='equation'>G<sub>n</sub> = G<sub>i</sub> + 1</span>
+            <br><br>
+            G<sub>i</sub> is the gain for an inverting op amp, and G<sub>n</sub> is the gain for a non-inverting op amp.
+            <p>
+            Using our new definitions, we can rewrite the solution for V<sub>m</sub> as:
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br><br>
+            This single equation solves the following circuits:
+            <ulist>
+              <li>Resistor divider</li>
+              <li>Inverting opamp</li>
+              <li>Non-inverting opamp</li>
+            </ulist>
+            <p>
+            This table shows the substitutions for V<sub>t</sub>, V<sub>m</sub> and V<sub>b</sub> for each of these solutions.
+            <table class='subtable'>
+              <tr>
+                <td></td><td>Resistor Divider</td><td>Inverting Opamp</td><td>Non-Inverting Opamp</td>
+              </tr>
+              <tr>
+                <td>V<sub>t</sub></td><td>V<sub>in</sub></td><td>V<sub>out</sub></td><td>V<sub>out</sub></td>
+              </tr>
+              <tr>
+                <td>V<sub>m</sub></td><td>V<sub>out</sub></td><td>V<sub>ref</sub></td><td>V<sub>in</sub></td>
+              </tr>
+              <tr>
+                <td>V<sub>b</sub></td><td>V<sub>b</sub></td><td>V<sub>in</sub></td><td>V<sub>ref</sub></td>
+              </tr>
+            </table>
+            <p>
+            Let's examine each of these circuits.
+            
+            
+            <h3>Resistor Divider</h3>
+            <p>
+            Starting with the generalized equation, use the substitutions from the table above for resistor dividers,
+            and replace G<sub>n</sub> with its definition.
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>V<sub>t</sub> = V<sub>in</sub></span>
+            <br>
+            <span class='equation'>V<sub>m</sub> = V<sub>out</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> = (R<sub>1</sub> / R<sub>2</sub>) + 1</span>
+            <br>
+            <span class='equation'>V<sub>out</sub> = V<sub>b</sub> + (V<sub>in</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>V<sub>out</sub> = V<sub>b</sub> + (V<sub>in</sub> - V<sub>b</sub>) * R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</span>
+            <br><br>
+            In a resistor divider, V<sub>b</sub> is usually zero.  Removing those terms yields:
+            <br><br>
+            <span class='equation'>V<sub>out</sub> = V<sub>in</sub> * R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)</span>
+            <br><br>
+            Which is the classic resistor divider equation we all know and love.
+            
+            
+            <h3>Inverting Opamp</h3>
+            <img class='op_img' src='inverting.png' width='300'>
+            <p>
+            Again, starting with the generalized equation, do the substitutions for inverting opamps.
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>V<sub>t</sub> = V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>m</sub> = V<sub>ref</sub></span>
+            <br>
+            <span class='equation'>V<sub>b</sub> = V<sub>in</sub></span>
+            <br>
+            <span class='equation'>V<sub>ref</sub> = V<sub>in</sub> + (V<sub>out</sub> - V<sub>in</sub>) / G<sub>n</sub></span>
+            <br><br>
+            Solve for V<sub>out</sub>.
+            <br><br>
+            <span class='equation'>V<sub>ref</sub> = V<sub>in</sub> + V<sub>out</sub> / G<sub>n</sub> - V<sub>in</sub> / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>V<sub>ref</sub> = V<sub>out</sub> / G<sub>n</sub> + V<sub>in</sub> - V<sub>in</sub> / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> * V<sub>ref</sub> = V<sub>out</sub> + G<sub>n</sub> * V<sub>in</sub> - V<sub>in</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> * V<sub>ref</sub> = V<sub>out</sub> + V<sub>in</sub> * (G<sub>n</sub> - 1)</span>
+            <br>
+            <span class='equation'>G<sub>n</sub> * V<sub>ref</sub> = V<sub>out</sub> + V<sub>in</sub> * G<sub>i</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> * V<sub>ref</sub> - V<sub>in</sub> * G<sub>i</sub> = V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>out</sub> = G<sub>n</sub> * V<sub>ref</sub> - V<sub>in</sub> * G<sub>i</sub></span>
+            <br><br>
+            V<sub>ref</sub> in an inverting opamp circuit is normally 0, so removing that term results in the classic inverting opamp equation.
+            <br><br>
+            <span class='equation'>V<sub>out</sub> =  - V<sub>in</sub> * G<sub>i</sub></span>
+            <br><br>
+            
+            
+            <h3>Non-Inverting Opamp</h3>
+            <img class='op_img' src='noninverting.png' width='300'>
+            <p>
+            As before, start with the generalized equation and do the substitutions for non-inverting opamps.
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br>
+            <span class='equation'>V<sub>t</sub> = V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>m</sub> = V<sub>in</sub></span>
+            <br>
+            <span class='equation'>V<sub>b</sub> = V<sub>ref</sub></span>
+            <br>
+            <span class='equation'>V<sub>in</sub> = V<sub>ref</sub> + (V<sub>out</sub> - V<sub>ref</sub>) / G<sub>n</sub></span>
+            <br><br>
+            Solve for V<sub>out</sub>.
+            <br><br>
+            <span class='equation'>V<sub>in</sub> * G<sub>n</sub> = V<sub>ref</sub> * G<sub>n</sub> + V<sub>out</sub> - V<sub>ref</sub></span>
+            <br>
+            <span class='equation'>V<sub>in</sub> * G<sub>n</sub> = V<sub>ref</sub> * G<sub>n</sub> - V<sub>ref</sub> + V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>in</sub> * G<sub>n</sub> = V<sub>ref</sub> * (G<sub>n</sub> - 1) + V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>in</sub> * G<sub>n</sub> = V<sub>ref</sub> * G<sub>i</sub> + V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>in</sub> * G<sub>n</sub> - V<sub>ref</sub> * G<sub>i</sub> = V<sub>out</sub></span>
+            <br>
+            <span class='equation'>V<sub>out</sub> = V<sub>in</sub> * G<sub>n</sub> - V<sub>ref</sub> * G<sub>i</sub></span>
+            <br><br>
+            Again, V<sub>ref</sub> is normally 0, so removing that term results in the classic non-inverting opamp equation.
+            <br><br>
+            <span class='equation'>V<sub>out</sub> = V<sub>in</sub> * G<sub>n</sub></span>
+            <br><br>
+            So there you have it.  There really aren't separate equations for resistor dividers and opamps.
+            There is only one equation, and it merits being memorized.
+            <br><br>
+            <span class='equation'>V<sub>m</sub> = V<sub>b</sub> + (V<sub>t</sub> - V<sub>b</sub>) / G<sub>n</sub></span>
+            <br><br>
+            Also, the opamp really isn't some special kind of device, it is more of a Resistor Divider Driver (RDD) device that
+            enables resistor dividers to be used in more scenarios.
+            Instead of making the resistor divider that accompanies the opamp secondary to the opamp, one should really make the
+            resistor divider primary, and the opamp secondary.
+            <h3>Defining Rfeedback</h3>
+            Given V<sub>in_rhalf</sub> and V<sub>out_rhalf</sub>, calculating the value of R<sub>feedback</sub> is easy.
+            <br><br>
+            <span class='equation'>G<sub>i</sub> = V<sub>out_rhalf</sub> / V<sub>in_rhalf</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> = G<sub>i</sub> - 1</span>
+            <br>
+            <span class='equation'>R<sub>feedback</sub> = R<sub>1</sub> * G</span>
+            <br><br>
+            Where G is G<sub>i</sub> for inverting opamp circuits, and G<sub>n</sub> for non-inverting opamp circuits.
+            <h3>Defining Vref</h3>
+            Once R<sub>feedback</sub> has been defined, one can assign the value of V<sub>ref</sub>.
+            We assume that the value of R<sub>1</sub> is fixed.
+            <p>
+            For inverting opamp circuits, we have:
+            <br><br>
+            <span class='equation'>G<sub>n</sub> = R<sub>feedback</sub> / R<sub>1</sub></span>
+            <br>
+            <span class='equation'>G<sub>i</sub> = G<sub>n</sub> - 1</span>
+            <br>
+            <span class='equation'>V<sub>ref</sub> = V<sub>in_offset</sub> + (V<sub>out_offset</sub> - V<sub>in_offset</sub>) / (G<sub>n</sub> + 1)</span>
+            <br><br>
+            For non-inverting opamp circuits, we have:
+            <br><br>
+            <span class='equation'>G<sub>i</sub> = R<sub>feedback</sub> / R<sub>1</sub></span>
+            <br>
+            <span class='equation'>G<sub>n</sub> = G<sub>i</sub> + 1</span>
+            <br>
+            <span class='equation'>V<sub>ref</sub> = (V<sub>in_offset</sub> * G<sub>n</sub> - V<sub>out_offset</sub>) / G<sub>i</sub></span>
+            <br><br>
+           </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
