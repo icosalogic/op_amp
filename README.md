@@ -15,6 +15,7 @@ This is especially convenient for using the tool when you have no internet conne
 Most of the data fields on the left hand panel can be edited.
 Once the focus leaves that input element (say, by clicking outside the edit box or
 tabbing to the next field), all other dependent fields will be updated, including the graphs.
+
 None of the values you enter are saved, either locally or on a remote server.
 Your data never leaves your machine.
 If you close the browser page for this tool, the values you entered are discarded.
