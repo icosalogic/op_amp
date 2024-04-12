@@ -4,6 +4,8 @@ This tool is used for configuring op amps.
 It works for inverting and non-inverting configs, with optional input and output offsets.
 The output includes a graph of a sine wave input and output of the op amp as configured.
 
+![Example](op_amp.png)
+
 # Usage
 
 There is a version of this tool running at [beta.icosalogic.com/op_amp/](http://beta.icosalogic.com/op_amp/).
