@@ -389,7 +389,11 @@ icosalogic.op_amp.calculateVref = function() {
   var gain_inv  = oa.rfeedback / oa.r1;
   var gain_ninv = gain_inv + 1.0;
   if (oa.circuit == 'noninv') {
-    oa.vref = (oa.vin_offset * gain_ninv - oa.vout_offset) / gain_inv;
+    if (oa.rfeedback == 0) {
+      oa.vref = oa.vin;
+    } else {
+      oa.vref = (oa.vin_offset * gain_ninv - oa.vout_offset) / gain_inv;
+    }
   } else {
     gain_ninv = oa.rfeedback / oa.r1;
     gain_inv  = gain_ninv - 1.0;
