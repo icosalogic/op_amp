@@ -151,7 +151,7 @@ icosalogic.op_amp.graphOpAmpChart = function() {
     },
     vAxis: {
       title: 'Volts',
-      format: "#.##"
+      format: "#.###"
     },
     interpolateNulls: true,
     height: 700,
